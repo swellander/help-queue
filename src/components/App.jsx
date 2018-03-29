@@ -1,49 +1,85 @@
-//Steps to turn stateless functional component into a class-based component: https://www.learnhowtoprogram.com/react/managing-state/lifting-state-part-2
-
-// Create an ES6 class with the same name that extends React.Component.
-// Add a single empty method to it called render().
-// Move the body of the function into the render() method.
-// Replace any calls to props with this.props in the render() body. (And, calls to any event handlers should change from eventHandlerName to this.eventHandlerName).
-// Delete the remaining empty function declaration.
-
 import React from 'react';
 import Header from './Header';
 import TicketList from './TicketList';
 import NewTicketControl from './NewTicketControl';
+import Admin from './Admin';
 import Error404 from './Error404';
 import { Switch, Route } from 'react-router-dom';
+import Moment from 'moment';
+import { v4 } from 'uuid';
 
 class App extends React.Component {
-  
+
   constructor(props) {
     super(props);
     this.state = {
-      masterTicketList: []
+      masterTicketList: [
+        {
+          names: 'Sam and Andy',
+          location: 'Room 4f',
+          issue: 'Having trouble deterimining which of us is taller. Tried using our eyes but can\'t get the angle. Need third opinion.',
+          id: v4(),
+          timeOpen: new Moment()
+        },
+        {
+          names: 'John and Lorenzo',
+          location: 'Room 2e',
+          issue: 'John\'s back itches but I cannot help him because I am lost in my own thoughts. Help plz.',
+          id: v4(),
+          timeOpen: new Moment()
+        },
+        {
+          names: 'Rufus and Palosi',
+          location: 'Room 2f',
+          issue: 'Help us. Dear ppl plz help us. We don\'t need it help we just really really want it.',
+          id: v4(),
+          timeOpen: new Moment()
+        }
+      ]
     };
-
     this.handleAddingNewTicketToList = this.handleAddingNewTicketToList.bind(this);
   }
 
-  handleAddingNewTicketToList(newTicket) {
+  componentDidMount() {
+    this.waitTimeUpdateTimer = setInterval(() =>
+      this.updateTicketElapsedWaitTime(),
+    60000
+    );
+  }
+
+  componentWillUnmount(){
+    clearInterval(this.waitTimeUpdateTimer);
+  }
+
+  updateTicketElapsedWaitTime() {
     let newMasterTicketList = this.state.masterTicketList.slice();
+    newMasterTicketList.forEach((ticket) =>
+      ticket.formattedWaitTime = (ticket.timeOpen).fromNow(true)
+    );
+    this.setState({masterTicketList: newMasterTicketList});
+  }
+
+  handleAddingNewTicketToList(newTicket){
+    var newMasterTicketList = this.state.masterTicketList.slice();
+    newTicket.formattedWaitTime = (newTicket.timeOpen).fromNow(true);
     newMasterTicketList.push(newTicket);
     this.setState({masterTicketList: newMasterTicketList});
   }
 
-  render() {
+  render(){
     return (
       <div>
         <Header/>
         <Switch>
-          <Route exact path='/' render={() => <TicketList ticketList={this.state.masterTicketList} />} />
-          <Route path='/newticket' render={() => <NewTicketControl onNewTicketCreation={this.handleAddingNewTicketToList}/> } />
+          <Route exact path='/' render={()=><TicketList ticketList={this.state.masterTicketList} />} />
+          <Route path='/newticket' render={()=><NewTicketControl onNewTicketCreation={this.handleAddingNewTicketToList} />} />
+          <Route path='/admin' render={(props)=><Admin currentRouterPath={props.location.pathname} ticketList={this.state.masterTicketList} />}/>
           <Route component={Error404} />
         </Switch>
       </div>
     );
   }
+
 }
-
-
 
 export default App;
