@@ -13,31 +13,34 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      masterTicketList: [
-        {
-          names: 'Sam and Andy',
-          location: 'Room 4f',
-          issue: 'Having trouble deterimining which of us is taller. Tried using our eyes but can\'t get the angle. Need third opinion.',
-          id: v4(),
-          timeOpen: new Moment()
-        },
-        {
-          names: 'John and Lorenzo',
-          location: 'Room 2e',
-          issue: 'John\'s back itches but I cannot help him because I am lost in my own thoughts. Help plz.',
-          id: v4(),
-          timeOpen: new Moment()
-        },
-        {
-          names: 'Rufus and Palosi',
-          location: 'Room 2f',
-          issue: 'Help us. Dear ppl plz help us. We don\'t need it help we just really really want it.',
-          id: v4(),
-          timeOpen: new Moment()
-        }
-      ]
+      // masterTicketList: [
+      //   {
+      //     names: 'Sam and Andy',
+      //     location: 'Room 4f',
+      //     issue: 'Having trouble deterimining which of us is taller. Tried using our eyes but can\'t get the angle. Need third opinion.',
+      //     id: v4(),
+      //     timeOpen: new Moment()
+      //   },
+      //   {
+      //     names: 'John and Lorenzo',
+      //     location: 'Room 2e',
+      //     issue: 'John\'s back itches but I cannot help him because I am lost in my own thoughts. Help plz.',
+      //     id: v4(),
+      //     timeOpen: new Moment()
+      //   },
+      //   {
+      //     names: 'Rufus and Palosi',
+      //     location: 'Room 2f',
+      //     issue: 'Help us. Dear ppl plz help us. We don\'t need it help we just really really want it.',
+      //     id: v4(),
+      //     timeOpen: new Moment()
+      //   }
+      // ],
+      masterTicketList: [],
+      selectedTicket: null
     };
     this.handleAddingNewTicketToList = this.handleAddingNewTicketToList.bind(this);
+    this.handleChanginSelectedTicket = this.handleChanginSelectedTicket.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +48,10 @@ class App extends React.Component {
       this.updateTicketElapsedWaitTime(),
     60000
     );
+  }
+
+  handleChanginSelectedTicket(ticket) {
+    this.setState({selectedTicket: ticket});
   }
 
   componentWillUnmount(){
@@ -73,7 +80,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' render={()=><TicketList ticketList={this.state.masterTicketList} />} />
           <Route path='/newticket' render={()=><NewTicketControl onNewTicketCreation={this.handleAddingNewTicketToList} />} />
-          <Route path='/admin' render={(props)=><Admin currentRouterPath={props.location.pathname} ticketList={this.state.masterTicketList} />}/>
+          <Route path='/admin' render={(props)=><Admin selectedTicket={this.state.selectedTicket}onTicketSelection={this.handleChanginSelectedTicket} currentRouterPath={props.location.pathname} ticketList={this.state.masterTicketList} />}/>
           <Route component={Error404} />
         </Switch>
       </div>
