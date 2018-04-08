@@ -7,21 +7,24 @@ function TicketList(props) {
     <div>
       <hr/>
 
-      {props.ticketList.map((ticket) =>
-        <Ticket names={ticket.names}
+      {Object.keys(props.ticketList).map(function(ticketId) {
+        var ticket = props.ticketList[ticketId];
+        return <Ticket names={ticket.names}
           location={ticket.location}
           issue={ticket.issue}
           key={ticket.id}
+          ticketId={ticketId}
           currentRouterPath={props.currentRouterPath}
           formattedWaitTime={ticket.formattedWaitTime} 
           onTicketSelection={props.onTicketSelection}/>
-      )}
+      })}
+
     </div>
   );
 }
 
 TicketList.propTypes = {
-  ticketList: PropTypes.array,
+  ticketList: PropTypes.object,
   currentRouterPath: PropTypes.string,
   onTicketSelection: PropTypes.func
 };
